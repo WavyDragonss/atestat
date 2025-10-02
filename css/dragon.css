@@ -1,54 +1,43 @@
-/* Hide native scrollbar */
 body {
-  scrollbar-width: none; /* Firefox */
-}
-body::-webkit-scrollbar {
-  display: none; /* Chrome/Safari/Edge */
+  margin: 0;
+  padding: 0;
+  overflow-y: scroll;
+  height: 200vh; /* Demo: make page scrollable */
 }
 
-/* Dragon container */
-.dragon-scroll {
+/* Dragon scrollbar container */
+#dragon-scrollbar {
   position: fixed;
   top: 0;
   right: 0;
-  width: 50px;
-  height: 100%;
-  pointer-events: none; /* allows normal page interaction */
+  width: 80px;
+  height: 100vh;
+  pointer-events: none;
   z-index: 9999;
+  transition: filter 0.2s;
 }
 
-/* Tail starts at the top */
-.dragon-tail {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50px;
-  height: 20px;
-  background: url('../img/tail.png') no-repeat center;
-  background-size: contain;
+#dragon-scrollbar.scrolled {
+  filter: drop-shadow(0 0 8px #8be9fd);
 }
 
-/* Body = repeatable noodle */
-.dragon-body {
-  position: absolute;
-  top: 20px;
-  bottom: 60px; /* leave room for head */
-  right: 0;
-  width: 50px;
-  background: url('../img/body-segment.png') repeat-y center;
-  background-size: contain;
-  transition: transform 0.2s;
-}
-
-/* Head appears at bottom */
+/* Dragon head styles */
 .dragon-head {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 60px;
-  height: 60px;
-  background: url('../img/head.png') no-repeat center;
-  background-size: contain;
-  opacity: 0; /* hidden at start */
-  transition: opacity 0.3s;
+  width: 80px;
+  height: 80px;
+  display: none;
+  z-index: 10000;
+}
+
+.dragon-head.visible {
+  display: block;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0.5; }
 }
