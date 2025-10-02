@@ -1,0 +1,54 @@
+/* Hide native scrollbar */
+body {
+  scrollbar-width: none; /* Firefox */
+}
+body::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge */
+}
+
+/* Dragon container */
+.dragon-scroll {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 100%;
+  pointer-events: none; /* allows normal page interaction */
+  z-index: 9999;
+}
+
+/* Tail starts at the top */
+.dragon-tail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 20px;
+  background: url('../img/tail.png') no-repeat center;
+  background-size: contain;
+}
+
+/* Body = repeatable noodle */
+.dragon-body {
+  position: absolute;
+  top: 20px;
+  bottom: 60px; /* leave room for head */
+  right: 0;
+  width: 50px;
+  background: url('../img/body-segment.png') repeat-y center;
+  background-size: contain;
+  transition: transform 0.2s;
+}
+
+/* Head appears at bottom */
+.dragon-head {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: url('../img/head.png') no-repeat center;
+  background-size: contain;
+  opacity: 0; /* hidden at start */
+  transition: opacity 0.3s;
+}
