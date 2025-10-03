@@ -1,83 +1,69 @@
-body {
-    background-color: #7FEFFF; /* cyan deschis */
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+:root {
+  --circle-base: 100px;   /* Dimensiunea de bază (modifici doar aici) */
 }
 
-header {
-    padding-top: 40px;
+body {
+  background-color: cyan;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 h1 {
-    color: white;
-    text-align: center;
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin: 0;
+  color: white;
+  margin-top: 30px;
+  font-size: 3rem;
 }
 
-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.circle-container {
-    display: flex;
-    justify-content: center;
-    margin: 40px 0 60px 0;
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 50px;
+  margin-top: 40px;
 }
 
 .circle {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: bold;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.07);
-    transition: transform 0.2s;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  text-align: center;
 }
 
+/* Cercurile cu text */
+.circle-text {
+  background-color: darkblue;
+  font-size: 1.2rem;
+}
+
+/* Cerc stânga */
+.left {
+  width: calc(var(--circle-base) * 2);
+  height: calc(var(--circle-base) * 2);
+}
+
+/* Cerc dreapta */
+.right {
+  width: calc(var(--circle-base) * 2);
+  height: calc(var(--circle-base) * 2);
+}
+
+/* Cerc cu imagine */
 .circle-image {
-    background: white;
-    border: 4px solid #fff;
-    overflow: hidden;
+  width: calc(var(--circle-base) * 3.5);
+  height: calc(var(--circle-base) * 3.5);
+  margin: 40px auto;
+  overflow: hidden;
+  border: 5px solid white;
 }
 
 .circle-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 4px solid white;
-}
-
-.menu-circles {
-    display: flex;
-    gap: 50px;
-    justify-content: center;
-}
-
-.circle-text {
-    background-color: #12306B; /* albastru închis */
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-weight: bold;
-    border: 2px solid #fff;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.13);
-}
-.circle-text:hover {
-    transform: scale(1.07);
-    background-color: #23499C;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
