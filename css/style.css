@@ -1,64 +1,48 @@
 :root {
-  --circle-base: 100px;   /* Dimensiunea de bază (modifici doar aici) */
+  --circle-base: 200px;       /* dimensiunea de bază */
+  --circle-text: 400px;       /* 200% */
+  --circle-image: 700px;      /* 350% */
 }
 
 body {
-  background-color: cyan;
-  font-family: Arial, sans-serif;
+  background-color: #7FEFFF; /* cyan deschis */
   margin: 0;
-  padding: 0;
-  text-align: center;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding-top: 40px;
 }
 
 h1 {
   color: white;
-  margin-top: 30px;
-  font-size: 3rem;
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 50px;
-  margin-top: 40px;
-}
-
-.circle {
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
   text-align: center;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0;
 }
 
-/* Cercurile cu text */
-.circle-text {
-  background-color: darkblue;
-  font-size: 1.2rem;
-}
-
-/* Cerc stânga */
-.left {
-  width: calc(var(--circle-base) * 2);
-  height: calc(var(--circle-base) * 2);
-}
-
-/* Cerc dreapta */
-.right {
-  width: calc(var(--circle-base) * 2);
-  height: calc(var(--circle-base) * 2);
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Cerc cu imagine */
 .circle-image {
-  width: calc(var(--circle-base) * 3.5);
-  height: calc(var(--circle-base) * 3.5);
-  margin: 40px auto;
+  width: var(--circle-image);
+  height: var(--circle-image);
+  border-radius: 50%;
+  background: white;
+  border: 6px solid #fff;
   overflow: hidden;
-  border: 5px solid white;
+  margin: 40px auto;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
 }
 
 .circle-image img {
@@ -66,4 +50,36 @@ h1 {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+/* Container pentru cele 2 cercuri text */
+.menu-circles {
+  display: flex;
+  justify-content: space-between;
+  width: 90%;   /* împinge cercurile spre stânga și dreapta */
+  margin-top: 60px;
+}
+
+/* Cercuri text */
+.circle-text {
+  width: var(--circle-text);
+  height: var(--circle-text);
+  border-radius: 50%;
+  background-color: #12306B;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  border: 3px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.circle-text:hover {
+  transform: scale(1.07);
+  background-color: #23499C;
 }
