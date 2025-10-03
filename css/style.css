@@ -1,7 +1,7 @@
 :root {
   --circle-base: 200px;       /* dimensiunea de bază */
-  --circle-text: 400px;       /* 200% */
-  --circle-image: 700px;      /* 350% */
+  --circle-text: 500px;       /* 200% */
+  --circle-image: 400px;      /* 350% */
 }
 
 body {
@@ -56,9 +56,10 @@ main {
 .menu-circles {
   display: flex;
   justify-content: space-between;
-  width: 90%;   /* împinge cercurile spre stânga și dreapta */
-  margin-top: 60px;
+  width: 100%;
+  margin-top: 10px;
 }
+
 
 /* Cercuri text */
 .circle-text {
