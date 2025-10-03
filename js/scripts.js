@@ -1,0 +1,1 @@
+// Pregătit pentru viitoare animații sau efecte
