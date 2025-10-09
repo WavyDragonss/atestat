@@ -1,5 +1,6 @@
 @import url("../style.css");
-/* Suplimentar local, dacă vrei, dar mostenește stilul din style.css */
-.container { max-width: 880px; margin: 38px auto; padding: 24px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(30,40,80,0.07); }
-h1 { color: #1756e9; }
-.section { margin-bottom: 24px; }
+.container { max-width: 900px; margin: 38px auto; padding: 24px; background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(30,40,80,0.07); }
+.ascii { font-size: 1.15rem; font-family: 'Fira Mono', monospace; }
+.result-block table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+.result-block th, .result-block td { border: 1px solid #cbd5e1; padding: 6px 10px; text-align: center; }
+.result-block th { background: #eff6ff; }
