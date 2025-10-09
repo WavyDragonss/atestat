@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Vizualizator ASCII de grafuri</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Vizualizator ASCII de grafuri</h1>
+    <p>Poți introduce matricea sau lista de adiacență a unui graf (orientat sau neorientat) și vei vedea reprezentarea ASCII + SVG. Folosește inputul de mai jos:</p>
+    <div class="section">
+      <label>Format input:</label>
+      <div class="controls">
+        <label><input type="radio" name="format" value="matrix" checked> Matrice</label>
+        <label><input type="radio" name="format" value="list"> Listă</label>
+      </div>
+      <label>Tip graf:</label>
+      <div class="controls">
+        <label><input type="radio" name="directed" value="false" checked> Neorientat</label>
+        <label><input type="radio" name="directed" value="true"> Orientat</label>
+      </div>
+      <label>Input:</label>
+      <textarea id="inputArea" placeholder="Ex: 0 1 1 1\n1 0 1 1\n1 1 0 1\n1 1 1 0"></textarea>
+      <div class="buttons">
+        <button id="parseBtn">Parse & Draw</button>
+        <button id="clearBtn" class="gray">Clear</button>
+        <button id="copyBtn" class="green">Copy ASCII</button>
+        <button id="toggleModeBtn" class="blue">Mod: ASCII</button>
+      </div>
+      <div id="statusMsg" class="status"></div>
+    </div>
+    <div class="section">
+      <h2>Rezultat ASCII</h2>
+      <div class="ascii-card">
+        <pre id="asciiOut" class="ascii">(apasă Parse & Draw pentru a genera)</pre>
+      </div>
+      <div id="svgOut" class="svg-card" style="display:none"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
