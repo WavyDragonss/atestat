@@ -35,102 +35,127 @@ function parseList(text){
   return adj;
 }
 
-// Layout nodes on a circle mapped to character grid
-function layoutNodes(n, W, H){
-  const cx = Math.floor(W/2), cy = Math.floor(H/2);
-  const r = Math.min(W,H)/2 - 6;
-  const positions = [];
-  for(let i=0;i<n;i++){
-    const theta = (2*Math.PI*i)/n - Math.PI/2;
-    const x = Math.round(cx + (r * Math.cos(theta)));
-    const y = Math.round(cy + (r * Math.sin(theta)));
-    positions.push({x,y});
-  }
-  return positions;
-}
-
-// draw line between two grid points using simple integer interpolation
-function drawLine(grid, x0,y0,x1,y1, directed=false){
-  const dx = x1-x0, dy = y1-y0;
-  const steps = Math.max(Math.abs(dx), Math.abs(dy));
-  if(steps===0) return;
-  for(let s=0;s<=steps;s++){
-    const t = s/steps;
-    const x = Math.round(x0 + dx*t);
-    const y = Math.round(y0 + dy*t);
-    if(x<0||y<0||y>=grid.length||x>=grid[0].length) continue;
-    if(grid[y][x] === ' ') {
-      if(Math.abs(dx) > Math.abs(dy)) grid[y][x] = '-';
-      else if(Math.abs(dy) > Math.abs(dx)) grid[y][x] = '|';
-      else grid[y][x] = (dx*dy>0)?'\\':'/';
-    }
-  }
-  // arrowhead for directed graph
-  if(directed){
-    const ax = Math.round(x1 - Math.sign(dx));
-    const ay = Math.round(y1 - Math.sign(dy));
-    if(ax>=0 && ay>=0 && ay<grid.length && ax<grid[0].length) grid[ay][ax] = '>';
-  }
-}
-
-function renderASCII(adj, directed=false, W=95, H=32){
+// Detect root for arbore
+function detectRoot(adj, oriented){
   const n = adj.length;
-  const grid = Array.from({length:H}, ()=>Array.from({length:W}, ()=>' '));
-  const pos = layoutNodes(n, W, H);
-  for(let i=0;i<n;i++){
-    const {x,y} = pos[i];
-    const label = String(i+1);
-    for(let k=0;k<label.length;k++){
-      const xx = x + k - Math.floor(label.length/2);
-      if(xx>=0 && xx<W && y>=0 && y<H) grid[y][xx] = label[k];
-    }
+  if(oriented){
+    const indeg = Array(n).fill(0);
+    for(let i=0;i<n;i++) for(let j of adj[i]) indeg[j]++;
+    const roots = [];
+    for(let i=0;i<n;i++) if(indeg[i]===0) roots.push(i);
+    return roots;
+  }else{
+    const deg = adj.map(neigh=>neigh.length);
+    let maxDeg = Math.max(...deg);
+    let roots = [];
+    for(let i=0;i<n;i++) if(deg[i]===maxDeg) roots.push(i);
+    return roots;
   }
-  const drawn = new Set();
-  for(let i=0;i<n;i++){
-    for(const j of (adj[i]||[])){
-      if(j<0||j>=n) continue;
-      const key = i<j ? `${i},${j}` : `${j},${i}`;
-      if(!directed && drawn.has(key)) continue;
-      drawLine(grid, pos[i].x, pos[i].y, pos[j].x, pos[j].y, directed);
-      drawn.add(key);
-    }
-  }
-  return grid.map(row=>row.join('')).join('\n');
 }
 
-// SVG rendering (basic, circular layout)
-function renderSVG(adj, directed=false, W=780, H=340){
-  const n = adj.length;
-  const cx = W/2, cy = H/2;
-  const r = Math.min(W,H)/2 - 38;
-  const pos = [];
-  for(let i=0;i<n;i++){
-    const theta = (2*Math.PI*i)/n - Math.PI/2;
-    const x = cx + (r * Math.cos(theta));
-    const y = cy + (r * Math.sin(theta));
-    pos.push({x,y});
-  }
-  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:sans-serif">`;
-  // edges
-  for(let i=0;i<n;i++){
-    for(const j of (adj[i]||[])){
-      if(j<0||j>=n) continue;
-      if(!directed && j<i) continue;
-      const from = pos[i], to = pos[j];
-      let arrow = '';
-      if(directed){
-        const dx = to.x-from.x, dy = to.y-from.y;
-        const d = Math.sqrt(dx*dx+dy*dy);
-        const ax = to.x - 18*(dx/d), ay = to.y - 18*(dy/d);
-        arrow = `<polygon points="${ax},${ay} ${ax-6*(dy/d)},${ay+6*(dx/d)} ${ax+6*(dy/d)},${ay-6*(dx/d)}" fill="#1756e9"/>`;
+// Analyze tree (DFS)
+function analyzeTree(adj, root){
+  const n = adj.length, visited = Array(n).fill(false);
+  const children = Array.from({length:n},()=>[]);
+  let order = [];
+  function dfs(u){
+    visited[u]=true; order.push(u);
+    for(let v of adj[u]){
+      if(!visited[v]){
+        children[u].push(v);
+        dfs(v);
       }
-      svg += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#2556cc" stroke-width="2"/>${arrow}`;
     }
   }
-  // nodes
-  for(let i=0;i<n;i++){
-    svg += `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="18" fill="#fff" stroke="#1756e9" stroke-width="3"/>
-            <text x="${pos[i].x}" y="${pos[i].y+7}" font-size="1.2em" text-anchor="middle" fill="#1756e9">${i+1}</text>`;
+  dfs(root);
+  const props = order.map(u=>{
+    return {node:u+1, grad:adj[u].length, children:children[u].map(x=>x+1), leaf:children[u].length===0};
+  });
+  return props;
+}
+
+// ASCII Tree (pentru arbore)
+function drawAsciiTree(adj, root){
+  let lines = [];
+  function go(u, prefix, isLast, visited){
+    lines.push(prefix+(isLast?'└── ':'├── ')+ (u+1));
+    visited[u]=true;
+    const ch = adj[u].filter(v=>!visited[v]);
+    for(let i=0;i<ch.length;i++){
+      let newPrefix = prefix+(isLast?'    ':'│   ');
+      go(ch[i], newPrefix, i===ch.length-1, visited);
+    }
+  }
+  go(root, '', true, Array(adj.length).fill(false));
+  return lines.join('\n').replace(/^└── /,'');
+}
+
+// Fallback: listă adiacență
+function drawGraphAdjList(adj){
+  let out = [];
+  for(let i=0;i<adj.length;i++){
+    out.push((i+1)+': '+(adj[i].map(x=>x+1).join(', ') || '-'));
+  }
+  return out.join('\n');
+}
+
+// SVG rendering (circular for graf, ierarhic for arbore)
+function renderSVG(adj, type, root, directed=false, W=780, H=340){
+  const n = adj.length;
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:sans-serif">`;
+  if(type==='arbore' && typeof root==='number' && root>=0){
+    // Arbore ierarhic
+    const props = analyzeTree(adj, root);
+    let levels = [], nodeLevel = Array(n).fill(-1);
+    function setLevels(u, lvl){
+      if(!levels[lvl]) levels[lvl]=[];
+      levels[lvl].push(u);
+      nodeLevel[u]=lvl;
+      for(let v of adj[u]) if(nodeLevel[v]==-1) setLevels(v, lvl+1);
+    }
+    setLevels(root, 0);
+    const dy = 80, dx = W/Math.max(1,levels.reduce((max,lvl)=>Math.max(max,lvl.length),0));
+    let positions = {};
+    levels.forEach((lvl, y)=>{
+      lvl.forEach((u, i)=>{
+        positions[u] = {x: dx/2 + i*dx, y: 60+y*dy};
+        svg += `<circle cx="${positions[u].x}" cy="${positions[u].y}" r="18" fill="#fff" stroke="#1756e9" stroke-width="3"/>
+          <text x="${positions[u].x}" y="${positions[u].y+7}" font-size="1.2em" text-anchor="middle" fill="#1756e9">${u+1}</text>`;
+      });
+    });
+    for(let u=0;u<n;u++) for(let v of adj[u]){
+      svg += `<line x1="${positions[u].x}" y1="${positions[u].y}" x2="${positions[v].x}" y2="${positions[v].y}" stroke="#2556cc" stroke-width="2"/>`;
+    }
+  }else{
+    // Graf circular
+    const cx = W/2, cy = H/2;
+    const r = Math.min(W,H)/2 - 38;
+    const pos = [];
+    for(let i=0;i<n;i++){
+      const theta = (2*Math.PI*i)/n - Math.PI/2;
+      const x = cx + (r * Math.cos(theta));
+      const y = cy + (r * Math.sin(theta));
+      pos.push({x,y});
+    }
+    for(let i=0;i<n;i++){
+      for(const j of (adj[i]||[])){
+        if(j<0||j>=n) continue;
+        if(!directed && j<i) continue;
+        const from = pos[i], to = pos[j];
+        let arrow = '';
+        if(directed){
+          const dx = to.x-from.x, dy = to.y-from.y;
+          const d = Math.sqrt(dx*dx+dy*dy);
+          const ax = to.x - 18*(dx/d), ay = to.y - 18*(dy/d);
+          arrow = `<polygon points="${ax},${ay} ${ax-6*(dy/d)},${ay+6*(dx/d)} ${ax+6*(dy/d)},${ay-6*(dx/d)}" fill="#1756e9"/>`;
+        }
+        svg += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#2556cc" stroke-width="2"/>${arrow}`;
+      }
+    }
+    for(let i=0;i<n;i++){
+      svg += `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="18" fill="#fff" stroke="#1756e9" stroke-width="3"/>
+              <text x="${pos[i].x}" y="${pos[i].y+7}" font-size="1.2em" text-anchor="middle" fill="#1756e9">${i+1}</text>`;
+    }
   }
   svg += '</svg>';
   return svg;
@@ -145,38 +170,80 @@ const copyBtn = document.getElementById('copyBtn');
 const statusMsg = document.getElementById('statusMsg');
 const svgOut = document.getElementById('svgOut');
 const toggleModeBtn = document.getElementById('toggleModeBtn');
+const structureInputs = document.querySelectorAll('input[name="structure"]');
+const rootInput = document.getElementById('rootInput');
+const rootNodeInput = document.getElementById('rootNode');
+const analysisDiv = document.getElementById('analysis');
 
 let currentMode = 'ascii'; // 'ascii' or 'svg'
-let lastAdj = []; let lastDirected = false;
+let lastAdj = []; let lastDirected = false; let lastType = 'graf'; let lastRoot = -1;
 
 function showStatus(msg, ok=true) {
   statusMsg.textContent = msg;
   statusMsg.style.color = ok ? "#1756e9" : "#e0195a";
 }
 
+// show/hide rădăcină input
+structureInputs.forEach(inp => {
+  inp.addEventListener('change', ()=>{
+    if(document.querySelector('input[name="structure"]:checked').value==='arbore')
+      rootInput.style.display = '';
+    else rootInput.style.display = 'none';
+  });
+});
+
 function parseAndDraw(){
   try{
     const format = document.querySelector('input[name=format]:checked').value;
     const directed = document.querySelector('input[name=directed]:checked').value === 'true';
+    const type = document.querySelector('input[name="structure"]:checked').value;
     const text = inputArea.value;
     let adj = [];
     if(format==='matrix') adj = parseMatrix(text);
     else adj = parseList(text);
     if(adj.length===0) throw new Error('Nicio muchie sau nod găsit.');
-    lastAdj = adj; lastDirected = directed;
+    let root = -1;
+    if(type==='arbore'){
+      if(rootNodeInput.value){
+        root = Number(rootNodeInput.value)-1;
+        if(root<0||root>=adj.length) throw new Error('Rădăcină invalidă!');
+      }else{
+        const possibleRoots = detectRoot(adj, directed);
+        if(possibleRoots.length===0) throw new Error('Nu s-a detectat nicio rădăcină!');
+        root = possibleRoots[0];
+      }
+    }
+    lastAdj = adj; lastDirected = directed; lastType = type; lastRoot = root;
+    // output
+    let analysis = '';
+    if(type==='arbore'){
+      const props = analyzeTree(adj, root);
+      let frunze = props.filter(x=>x.leaf).length;
+      analysis = `<strong>Rădăcină:</strong> ${root+1}<br>
+      <strong>Număr frunze:</strong> ${frunze}<br>
+      <strong>Structură:</strong>
+      <table><tr><th>Nod</th><th>Grad</th><th>Fii</th><th>Frunză?</th></tr>`;
+      props.forEach(x=>{
+        analysis+=`<tr><td>${x.node}</td><td>${x.grad}</td><td>${x.children.length?x.children.join(', '):'—'}</td><td>${x.leaf?'Da':'Nu'}</td></tr>`;
+      });
+      analysis+='</table>';
+    }else analysis = '';
+    analysisDiv.innerHTML = analysis;
+
     if(currentMode==='ascii'){
-      asciiOut.textContent = renderASCII(adj, directed, 95, 32);
+      asciiOut.textContent = (type==='arbore') ? drawAsciiTree(adj, root) : drawGraphAdjList(adj);
       asciiOut.parentElement.style.display = '';
       svgOut.style.display = 'none';
     }else{
-      svgOut.innerHTML = renderSVG(adj, directed, 780, 340);
+      svgOut.innerHTML = renderSVG(adj, type, root, directed, 780, 340);
       svgOut.style.display = '';
       asciiOut.parentElement.style.display = 'none';
     }
-    showStatus('Graful a fost generat cu succes.', true);
+    showStatus('Structura a fost generată cu succes.', true);
   }catch(err){
     asciiOut.textContent = '(eroare la parse)';
     svgOut.innerHTML = '';
+    analysisDiv.innerHTML = '';
     showStatus('Eroare: ' + err.message, false);
   }
 }
@@ -187,6 +254,7 @@ clearBtn.addEventListener('click', ()=>{
   inputArea.value='';
   asciiOut.textContent='(apasă Parse & Draw pentru a genera)';
   svgOut.innerHTML='';
+  analysisDiv.innerHTML = '';
   showStatus('');
 });
 
@@ -200,7 +268,6 @@ copyBtn.addEventListener('click', ()=>{
       setTimeout(()=>copyBtn.textContent='Copy ASCII',900);
     });
   }else{
-    // SVG export (as text)
     const svgText = svgOut.innerHTML;
     navigator.clipboard.writeText(svgText).then(()=>{
       copyBtn.textContent='SVG Copied!';
@@ -224,89 +291,3 @@ toggleModeBtn.addEventListener('click', ()=>{
 });
 
 inputArea.value = '0 1 0 1\n1 0 1 0\n0 1 0 1\n1 0 1 0';
-
-// --- Analiza de probleme ---
-const problems = {
-  deg0: {
-    title: "Număr maxim de noduri de grad 0",
-    desc: `Într-un graf neorientat cu n noduri și m muchii, numărul maxim de noduri cu grad 0 se obține concentrând toate muchiile în cât mai puține noduri:
-<ul>
-  <li>Suma gradelor = 2m</li>
-  <li>Caută cel mai mic <b>k</b> cu k*(k-1)/2 ≥ m</li>
-  <li>Numărul maxim de noduri de grad 0 = n - k</li>
-</ul>`,
-    form: `<label>Număr noduri (n): <input type="number" id="deg0_n" value="10" min="1"></label>
-           <label>Număr muchii (m): <input type="number" id="deg0_m" value="7" min="0"></label>
-           <button id="deg0_calc">Calculează</button>`,
-    calc: function() {
-      const n = Number(document.getElementById('deg0_n').value);
-      const m = Number(document.getElementById('deg0_m').value);
-      let k = 1;
-      while (k*(k-1)/2 < m) k++;
-      return `Max noduri grad 0: <b>${n-k}</b> (toate muchiile pot fi concentrate între cele ${k} noduri)`;
-    }
-  },
-  strcpy: {
-    title: "Efect instrucțiune strcpy(s+2, s+4)",
-    desc: `strcpy(s+2, s+4) copiază caracterele din poziția 4 în poziția 2, suprascriind și trunchiind șirul.
-      <br>Exemplu: <code>s = "abcdefgh"</code> → <code>strcpy(s+2, s+4)</code> → <code>s = "abefgh"</code>`,
-    form: `<label>Șir inițial: <input type="text" id="strcpy_s" value="abcdefgh"></label>
-           <label>Dest offset (s+): <input type="number" id="strcpy_d" value="2" min="0"></label>
-           <label>Sursă offset (s+): <input type="number" id="strcpy_s_off" value="4" min="0"></label>
-           <button id="strcpy_calc">Calculează</button>`,
-    calc: function() {
-      let s = document.getElementById('strcpy_s').value;
-      let d = Number(document.getElementById('strcpy_d').value);
-      let soff = Number(document.getElementById('strcpy_s_off').value);
-      let result = s.slice(0, d) + s.slice(soff);
-      return `Rezultat: <code>${result}</code>`;
-    }
-  },
-  outdeg: {
-    title: "Grad extern maxim într-un graf orientat",
-    desc: `Pentru un graf orientat cu n noduri și m muchii, suma gradelor externe = m. Dacă 3 vârfuri au grad intern = 1, restul grad intern ≥ 0.<br>
-Distribuie muchiile astfel încât să maximizezi gradul extern al unui vârf.`,
-    form: `<label>Număr noduri (n): <input type="number" id="outdeg_n" value="6" min="1"></label>
-           <label>Număr muchii (m): <input type="number" id="outdeg_m" value="6" min="0"></label>
-           <label>Noduri cu grad intern 1: <input type="number" id="outdeg_gi1" value="3" min="0"></label>
-           <button id="outdeg_calc">Calculează</button>`,
-    calc: function() {
-      const n = Number(document.getElementById('outdeg_n').value);
-      const m = Number(document.getElementById('outdeg_m').value);
-      const gi1 = Number(document.getElementById('outdeg_gi1').value);
-      // grad extern maxim = m - (n-1) (toate muchiile pleacă dintr-un vârf, restul grad extern minim)
-      const rest = m - gi1;
-      return `Grad extern maxim posibil: <b>${rest}</b>`;
-    }
-  }
-};
-
-function renderProblemTab(tab) {
-  const pc = document.getElementById('problemContent');
-  const p = problems[tab];
-  pc.innerHTML = `<h3>${p.title}</h3><div>${p.desc}</div>
-    <form class="analysis-form">${p.form}</form>
-    <div class="result-block" id="analysisResult"></div>`;
-  // set up calc button
-  if(tab==="deg0") document.getElementById('deg0_calc').onclick = () => {
-    document.getElementById('analysisResult').innerHTML = problems.deg0.calc();
-  };
-  else if(tab==="strcpy") document.getElementById('strcpy_calc').onclick = () => {
-    document.getElementById('analysisResult').innerHTML = problems.strcpy.calc();
-  };
-  else if(tab==="outdeg") document.getElementById('outdeg_calc').onclick = () => {
-    document.getElementById('analysisResult').innerHTML = problems.outdeg.calc();
-  };
-}
-
-// Tabs logic
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.onclick = function() {
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-    renderProblemTab(this.dataset.problem);
-  }
-});
-// Default tab
-renderProblemTab('deg0');
-document.querySelector('.tab-btn[data-problem="deg0"]').classList.add('active');

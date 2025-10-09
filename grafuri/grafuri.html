@@ -16,10 +16,22 @@
         <label><input type="radio" name="format" value="matrix" checked> Matrice</label>
         <label><input type="radio" name="format" value="list"> Listă</label>
       </div>
+      <label>Tip structură:</label>
+      <div class="controls">
+        <label><input type="radio" name="structure" value="graf" checked> Graf</label>
+        <label><input type="radio" name="structure" value="arbore"> Arbore</label>
+      </div>
+      <div id="rootInput" style="display:none;">
+        <label>Rădăcină (nr. nod): <input type="number" id="rootNode" min="1"></label>
+      </div>
       <label>Tip graf:</label>
       <div class="controls">
         <label><input type="radio" name="directed" value="false" checked> Neorientat</label>
         <label><input type="radio" name="directed" value="true"> Orientat</label>
+      </div>
+      <label>Mod afișare:</label>
+      <div class="controls">
+        <button id="toggleModeBtn" class="blue">Mod: ASCII</button>
       </div>
       <label>Input:</label>
       <textarea id="inputArea" placeholder="Ex: 0 1 1 1\n1 0 1 1\n1 1 0 1\n1 1 1 0"></textarea>
@@ -27,7 +39,6 @@
         <button id="parseBtn">Parse & Draw</button>
         <button id="clearBtn" class="gray">Clear</button>
         <button id="copyBtn" class="green">Copy ASCII</button>
-        <button id="toggleModeBtn" class="blue">Mod: ASCII</button>
       </div>
       <div id="statusMsg" class="status"></div>
     </div>
@@ -37,6 +48,7 @@
         <pre id="asciiOut" class="ascii">(apasă Parse & Draw pentru a genera)</pre>
       </div>
       <div id="svgOut" class="svg-card" style="display:none"></div>
+      <div id="analysis" class="result-block"></div>
     </div>
   </div>
   <script src="script.js"></script>
