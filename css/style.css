@@ -1,11 +1,11 @@
 :root {
-  --circle-base: 200px;       /* dimensiunea de bază */
-  --circle-text: 500px;       /* 200% */
-  --circle-image: 400px;      /* 350% */
+  --circle-base: 200px;
+  --circle-text: 400px;       /* 200% */
+  --circle-image: 700px;      /* 350% */
 }
 
 body {
-  background-color: #7FEFFF; /* cyan deschis */
+  background-color: #7FEFFF;
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
   min-height: 100vh;
@@ -27,13 +27,14 @@ h1 {
 }
 
 main {
-  flex: 1;
+  min-height: 100vh;
+  flex: 1 0 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
 }
 
-/* Cerc cu imagine */
 .circle-image {
   width: var(--circle-image);
   height: var(--circle-image);
@@ -52,16 +53,14 @@ main {
   border-radius: 50%;
 }
 
-/* Container pentru cele 2 cercuri text */
 .menu-circles {
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  margin-top: 10px;
+  align-items: center;
+  width: 70%;
+  margin: 20px auto 0;
 }
 
-
-/* Cercuri text */
 .circle-text {
   width: var(--circle-text);
   height: var(--circle-text);
@@ -78,9 +77,112 @@ main {
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(0,0,0,0.2);
   transition: transform 0.2s, background-color 0.3s;
+  text-decoration: none;
 }
 
 .circle-text:hover {
   transform: scale(1.07);
-  background-color: #23499C;
+  background-color: #84d1db;
+  font-size: 2.8rem;
+  font-style: italic;
+}
+
+/* Scroll lin */
+html {
+  scroll-behavior: smooth;
+}
+
+/* SECȚIUNEA DESPRE MINE */
+.about-section {
+  position: relative;
+  background: #7FEFFF; /* fundalul general, pentru continuitate */
+  margin-top: 1cm;     /* exact 1 cm sub prima pagină */
+  min-height: 100vh;   /* secțiune înaltă cât ecranul */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.about-box {
+  width: 80%;
+  height: 70%;
+  background-color: #E60000;
+  outline: 5px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  transition: all 0.8s ease-out;
+  opacity: 0;
+  transform: scale(0.8) translateY(100px);
+  margin-top: 0;
+}
+
+.about-box h2 {
+  color: white;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.about-box.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Dreptunghi plutitor cu text */
+.floating-text-box {
+  position: fixed;
+  top: calc(100vh + 1cm); /* 1cm sub începutul secțiunii */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  padding: 20px 40px;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  text-align: center;
+  white-space: nowrap;
+  animation: float-move 4s ease-in-out infinite alternate;
+  z-index: 10;
+}
+
+/* Animația care mută cutia stânga-dreapta și puțin în jos */
+@keyframes float-move {
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    transform: translateX(-55%) translateY(10px);
+  }
+}
+
+/* Responsive (mobil/tabletă) */
+@media (max-width: 900px) {
+  :root {
+    --circle-text: 200px;
+    --circle-image: 300px;
+  }
+  .menu-circles {
+    width: 95%;
+    gap: 10px;
+  }
+  .about-box {
+    width: 95%;
+    height: 60%;
+  }
+  .about-box h2 {
+    font-size: 2rem;
+  }
+  .floating-text-box {
+    font-size: 1rem;
+    padding: 12px 18px;
+    border-radius: 10px;
+    white-space: normal;
+    max-width: 90vw;
+  }
 }
