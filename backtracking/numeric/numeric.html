@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>📘 Backtracking Numeric (cifre crescătoare)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📘 Backtracking Numeric (cifre crescătoare)</h1>
+    <p>Generează toate numerele de n cifre, cu reguli flexibile și afișare controlată.</p>
+    <div class="section">
+      <label>Lungime număr (n):</label>
+      <input type="number" id="lengthInput" value="5" min="2" max="9" style="width:60px">
+      <div class="controls">
+        <label><input type="checkbox" class="rule" value="strictIncreasing" checked> Strict crescător</label>
+        <label><input type="checkbox" class="rule" value="noTwoEven"> Fără două pare consecutive</label>
+        <label><input type="checkbox" class="rule" value="descendingOrder"> Ordine descrescătoare</label>
+        <!-- Extensibil: mai adaugi reguli aici simplu -->
+      </div>
+      <div>
+        <button id="generateBtn" class="blue">Generează</button>
+        <button id="expandBtn" class="gray">Extinde toate</button>
+        <button id="collapseBtn" class="gray" style="display:none">Ascunde</button>
+      </div>
+      <label>Afișează rezultatul #<input type="number" id="indexInput" value="6" min="1" style="width:48px"></label>
+      <button id="showNthBtn" class="green">Afișează</button>
+    </div>
+    <div class="section">
+      <h2>Rezultate</h2>
+      <div id="nthResult" class="status"></div>
+      <div id="resultStats" class="status"></div>
+      <div id="resultList" class="ascii-card" style="display:none"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
