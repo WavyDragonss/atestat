@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>🔁 Generator Backtracking Universal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔁 Generator Backtracking Universal</h1>
+    <p>Creează combinații de caractere sau cifre după reguli logice configurabile.</p>
+    <div class="section">
+      <div class="controls">
+        <label><input type="radio" name="type" value="char" checked> Caractere</label>
+        <label><input type="radio" name="type" value="num"> Numere</label>
+      </div>
+      <label>Simboluri disponibile:</label>
+      <input type="text" id="alphabetInput" value="a,b,c,d" style="width:220px">
+      <label>Lungime șir:</label>
+      <input type="number" id="lengthInput" value="4" min="1" style="width:60px">
+      <div id="rulesChar" class="rules-box">
+        <label><input type="checkbox" class="rule" value="noVowelsTogether" checked> fără două vocale consecutive</label>
+        <label><input type="checkbox" class="rule" value="noConsonantsTogether"> fără două consoane consecutive</label>
+        <label><input type="checkbox" class="rule" value="noDuplicates"> fără repetiții de litere</label>
+        <label><input type="checkbox" class="rule" value="startsWithVowel"> începe cu vocală</label>
+        <label><input type="checkbox" class="rule" value="endsWithConsonant"> se termină cu consoană</label>
+        <label><input type="checkbox" class="rule" value="alphabeticalOrder"> ordine alfabetică</label>
+      </div>
+      <div id="rulesNum" class="rules-box" style="display:none">
+        <label><input type="checkbox" class="rule" value="noConsecutiveNumbers" checked> fără două numere consecutive</label>
+        <label><input type="checkbox" class="rule" value="noEvenTogether"> fără două pare alăturate</label>
+        <label><input type="checkbox" class="rule" value="noOddTogether"> fără două impare alăturate</label>
+        <label><input type="checkbox" class="rule" value="noDuplicates"> fără repetiții de cifre</label>
+        <label><input type="checkbox" class="rule" value="ascendingOrder"> ordine crescătoare</label>
+        <label><input type="checkbox" class="rule" value="descendingOrder"> ordine descrescătoare</label>
+      </div>
+      <label>Condiție personalizată (experimental):</label>
+      <input type="text" id="customRuleInput" placeholder="ex: prima cifră < ultima cifră" style="width:220px">
+      <button id="addCustomRuleBtn" class="blue">Adaugă condiția</button>
+      <div class="buttons" style="margin-top:18px;">
+        <button id="generateBtn" class="blue">Generează</button>
+        <button id="expandBtn" class="gray">Extinde afișarea</button>
+        <button id="collapseBtn" class="gray" style="display:none">Ascunde rezultate</button>
+      </div>
+      <label style="margin-left:0;">Afișează rezultatul #<input type="number" id="indexInput" value="6" min="1" style="width:48px"></label>
+      <button id="showNthBtn" class="green">Afișează</button>
+    </div>
+    <div class="section">
+      <h2>Rezultate</h2>
+      <div id="nthResult" class="status"></div>
+      <div id="resultStats" class="status"></div>
+      <div id="resultList" class="ascii-card" style="display:none"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
