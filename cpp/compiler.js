@@ -1,6 +1,5 @@
 // compiler.js — integrat cu Judge0 CE (public instance) pentru "compile & run"
-// Folosește fluxul: build finalSource (template + user code) -> POST /submissions?base64_encoded=true&wait=true
-// Atenție: funcționează doar online (Judge0 CE public). Pentru offline folosești clang.wasm (vedi variante anterioare).
+// Flux: build finalSource (template + user code) -> POST /submissions?base64_encoded=true&wait=true
 
 const userCodeEl = document.getElementById('userCode');
 const modeEl = document.getElementById('mode');
@@ -11,7 +10,7 @@ const resetBtn = document.getElementById('resetBtn');
 const showCompleteBtn = document.getElementById('showCompleteBtn');
 const finalCodeEl = document.getElementById('finalCode');
 const consoleEl = document.getElementById('console');
-const stdinEl = document.getElementById('stdin') || { value: '' }; // optional input field if you add it
+const stdinEl = document.getElementById('stdin') || { value: '' }; // optional input field
 
 const TEMPLATES_PATH = './templates/';
 
@@ -28,7 +27,6 @@ function base64EncodeUtf8(str = '') {
   try {
     return btoa(unescape(encodeURIComponent(str)));
   } catch (e) {
-    // fallback for very large strings or environments without btoa
     if (typeof Buffer !== 'undefined') {
       return Buffer.from(str, 'utf8').toString('base64');
     }
@@ -56,14 +54,12 @@ function setFinalCode(text) {
 }
 
 // Pick a language_id for C++: try to fetch languages and select C++17/C++20 if present.
-// Fallback: common known ids may change, so prefer dynamic discovery.
 async function getCppLanguageId(preferred = ['c++17', 'c++20', 'c++14', 'c++']) {
   if (LANG_CACHE) return LANG_CACHE;
   try {
     const res = await fetch(JUDGE0_LANGUAGES);
     if (!res.ok) throw new Error(`languages endpoint: ${res.status}`);
     const langs = await res.json(); // array of {id, name, ...}
-    // Normalize: look for entries where name contains "C++" and "17"/"20"
     const lower = langs.map(l => ({ id: l.id, name: l.name.toLowerCase() }));
     for (const pref of preferred) {
       const found = lower.find(l => l.name.includes('c++') && l.name.includes(pref.replace('+','')));
@@ -72,7 +68,6 @@ async function getCppLanguageId(preferred = ['c++17', 'c++20', 'c++14', 'c++']) 
         return LANG_CACHE;
       }
     }
-    // fallback: first entry that contains "c++"
     const anyCpp = lower.find(l => l.name.includes('c++'));
     if (anyCpp) {
       LANG_CACHE = anyCpp.id;
@@ -80,36 +75,29 @@ async function getCppLanguageId(preferred = ['c++17', 'c++20', 'c++14', 'c++']) 
     }
     throw new Error('Nu s-a găsit niciun limbaj C++ în lista de limbaje Judge0.');
   } catch (err) {
-    // dacă nu putem obține lista, fallback la un id uzual cunoscut (notă: poate fi învechit)
     console.warn('Nu am putut obține lista de limbaje Judge0:', err);
-    // Common fallback id for C++ (may vary): 54 or 52 — use 54 (GCC 9.2.0) as reasonable fallback
-    LANG_CACHE = 54;
+    LANG_CACHE = 54; // fallback (may vary)
     return LANG_CACHE;
   }
 }
 
-// Build payload and call Judge0 CE (wait=true so response contains stdout/stderr/compile_output)
 async function submitToJudge0(finalSource, stdin = '') {
   const language_id = await getCppLanguageId();
   const payload = {
     source_code: base64EncodeUtf8(finalSource),
     language_id,
-    stdin: base64EncodeUtf8(stdin || ''),
-    // optional fields:
-    // cpu_time_limit, memory_limit, compiler_options, etc. (Judge0 supports some fields)
+    stdin: base64EncodeUtf8(stdin || '')
   };
 
   const res = await fetch(JUDGE0_SUBMISSIONS, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
-      // If you use your own Judge0 instance with an API key, add it here.
     },
     body: JSON.stringify(payload)
   });
 
   if (!res.ok) {
-    // Handle typical HTTP errors (rate limit, bad request)
     const text = await res.text().catch(() => '');
     throw new Error(`Judge0 request failed: ${res.status} ${res.statusText} ${text}`);
   }
@@ -118,19 +106,15 @@ async function submitToJudge0(finalSource, stdin = '') {
   return result;
 }
 
-// Interpret Judge0 result and return human-friendly text
 function formatJudge0Result(resJson) {
-  // resJson example fields (base64 encoded): stdout, stderr, compile_output, message, status { id, description }
   const statusDesc = resJson.status && resJson.status.description ? resJson.status.description : 'Unknown';
   const outParts = [`Status: ${statusDesc}`];
 
-  // decode base64 helper
   const b64dec = (s) => {
     if (!s) return '';
     try {
       return decodeURIComponent(escape(atob(s)));
     } catch (e) {
-      // fallback for Node Buffer env
       try { return Buffer.from(s, 'base64').toString('utf8'); } catch (_) { return s; }
     }
   };
@@ -164,7 +148,6 @@ async function compileAndRun(finalSource) {
   try {
     const stdin = (stdinEl && stdinEl.value) ? stdinEl.value : '';
     const resultJson = await submitToJudge0(finalSource, stdin);
-    // resultJson will include base64-encoded outputs when base64_encoded=true
     const formatted = formatJudge0Result(resultJson);
     setConsole(formatted);
   } catch (err) {
@@ -172,7 +155,7 @@ async function compileAndRun(finalSource) {
   }
 }
 
-// Event handlers (UI logic similar la ce ai definit anterior)
+// Event handlers
 compileBtn.addEventListener('click', async () => {
   setConsole('');
   try {
@@ -219,7 +202,7 @@ showCompleteBtn.addEventListener('click', async () => {
   }
 });
 
-// Populate defaults similar to before
+// Defaults
 (function initDefaults(){
   modeEl.addEventListener('change', () => {
     if (modeEl.value === 'subprog') {
