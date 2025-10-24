@@ -1,38 +1,58 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compilator C++ | Lotus IDE</title>
-
-  <!-- Font (opțional) -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Compilator C++ — Atestat</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Monaco loader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 </head>
 <body>
-  <header id="topbar">
-    <h1>Lotus IDE — Compilator C++ (local, WASM)</h1>
-    <div class="top-actions">
-      <button id="openReadme">Instrucțiuni</button>
-      <button id="downloadZip">Descarcă .zip (instrucțiuni)</button>
+  <main class="container">
+    <h1>Compilator C++ — Atestat</h1>
+
+    <div class="controls-row">
+      <label for="mode">Alege tipul de exercițiu:</label>
+      <select id="mode">
+        <option value="subprog">Subprogram (scrii doar funcția)</option>
+        <option value="full">Cod complet (fără include-uri)</option>
+      </select>
+
+      <label for="templateSelect">Șablon (opțional):</label>
+      <select id="templateSelect">
+        <option value="base.cpp">base.cpp</option>
+        <option value="subprog.cpp">subprog.cpp</option>
+        <option value="full.cpp">full.cpp</option>
+      </select>
+
+      <label class="checkbox">
+        <input type="checkbox" id="showFinal" />
+        Arată codul final înainte de compilare
+      </label>
     </div>
-  </header>
 
-  <div id="editor"></div>
+    <textarea id="userCode" placeholder="Scrie funcția/subprogramul sau codul tău aici..."></textarea>
 
-  <div id="controls">
-    <button id="runBtn">Compilează &amp; Rulează</button>
-    <select id="stdSelect" title="Standard C++">
-      <option value="-std=c++17">C++17</option>
-      <option value="-std=c++20">C++20</option>
-    </select>
-  </div>
+    <div class="buttons">
+      <button id="compileBtn" class="btn primary">▶ Compilează și rulează</button>
+      <button id="resetBtn" class="btn">↺ Resetare</button>
+      <button id="showCompleteBtn" class="btn orange">📜 Arată cod complet</button>
+    </div>
 
-  <pre id="output" aria-live="polite"></pre>
+    <section>
+      <h2>Cod final generat</h2>
+      <pre id="finalCode" class="output monospace" aria-live="polite">Codul final (șablon + cod utilizator) va apărea aici.</pre>
+    </section>
 
-  <script type="module" src="editor.js"></script>
+    <section>
+      <h2>Output</h2>
+      <pre id="console" class="console monospace" aria-live="polite">Consola va afișa rezultatul compilării și rulării.</pre>
+    </section>
+
+    <footer class="footer">
+      <small>Notă: pentru a încărca compilatorul WASM (clang.wasm + clang.js) plasează fișierele în /wasm/ și rulează site-ul pe un server static (ex.: python -m http.server).</small>
+    </footer>
+  </main>
+
+  <script type="module" src="compiler.js"></script>
 </body>
 </html>
