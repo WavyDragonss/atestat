@@ -1,0 +1,98 @@
+/* Stil elegant, dark, compatibil cu tema "lotus" */
+:root{
+  --bg1: #0f0f14;
+  --bg2: #171719;
+  --accent: #e91e63;
+  --muted: #9a9a9a;
+  --mono-bg: #0b0b0b;
+  --mono-fg: #7cff7c;
+}
+
+*{box-sizing: border-box}
+html,body{height:100%}
+body {
+  margin: 0;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2));
+  color: #eee;
+  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* top bar */
+#topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 18px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+#topbar h1{
+  font-size:16px;
+  margin:0;
+  font-weight:600;
+  color:#fff;
+}
+.top-actions button{
+  margin-left:8px;
+  background:transparent;
+  color:var(--muted);
+  border:1px solid rgba(255,255,255,0.03);
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.top-actions button:hover{ color:#fff; border-color: rgba(255,255,255,0.06) }
+
+#editor {
+  flex: 1;
+  border-bottom: 1px solid #222;
+  min-height: 300px;
+}
+
+/* controls */
+#controls {
+  padding: 10px;
+  text-align: center;
+  background: #111;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:center;
+}
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.12s;
+}
+button:hover { transform: translateY(-2px); background:#ff4f8a; }
+
+select {
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.03);
+  background:#111;
+  color:#eee;
+}
+
+/* output */
+#output {
+  background: var(--mono-bg);
+  color: var(--mono-fg);
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+  height: 180px;
+  overflow-y: auto;
+  margin: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
