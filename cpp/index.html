@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compilator C++ | Lotus IDE</title>
+
+  <!-- Font (opțional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+  <!-- Monaco loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
+</head>
+<body>
+  <header id="topbar">
+    <h1>Lotus IDE — Compilator C++ (local, WASM)</h1>
+    <div class="top-actions">
+      <button id="openReadme">Instrucțiuni</button>
+      <button id="downloadZip">Descarcă .zip (instrucțiuni)</button>
+    </div>
+  </header>
+
+  <div id="editor"></div>
+
+  <div id="controls">
+    <button id="runBtn">Compilează &amp; Rulează</button>
+    <select id="stdSelect" title="Standard C++">
+      <option value="-std=c++17">C++17</option>
+      <option value="-std=c++20">C++20</option>
+    </select>
+  </div>
+
+  <pre id="output" aria-live="polite"></pre>
+
+  <script type="module" src="editor.js"></script>
+</body>
+</html>
