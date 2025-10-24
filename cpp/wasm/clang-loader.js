@@ -1,70 +1,63 @@
-// Un loader mic care încearcă să încarce clang.js (Emscripten build) din același folder.
-// Scop: oferă o funcție async default export initClang(options)
-// initClang va returna un obiect { compileAndRun(code, options) } care compilează și rulează cod C++
-// NOTĂ: fișiere reale clang.js și clang.wasm nu sunt incluse aici. Urmează instrucțiunile din README.
+// Un loader minimalist pentru clang.js + clang.wasm.
+// Scop: oferă o funcție default initClang(opts) care încearcă să încarce clang.js
+// și să returneze un wrapper { compileAndRun(source, options) }.
+// IMPORTANT: implementarea exactă a compileAndRun depinde de build-ul clang-wasm pe care-l folosești.
+// Dacă build-ul tău exportă o funcție helper (ex: compileAndRun), loader-ul va apela acea funcție.
+// Altfel, loaderul va arunca o eroare explicativă.
 
 export default async function initClang(opts = {}) {
-  // opts.locateFile: fn(filename) => url (optional)
   const locateFile = opts.locateFile || ((f) => `./${f}`);
 
-  // În mod ideal, clang.js este un build Emscripten care exportă o funcție factory (Module -> Promise<Module>)
-  // Vom încerca să importăm clang.js. Dacă nu există, aruncăm o eroare informativă.
   try {
-    // eslint-disable-next-line
-    const mod = await import('./clang.js'); // trebuie să existe clang.js în același folder wasm/
-    // mod poate exporta o funcție default care inițializează (depinde de build).
-    // Permitem două scenarii:
-    // 1) mod.default este o funcție init(Module) => Promise(Module)
-    // 2) mod provides a Module factory via createModule or directly returns an object
+    // În mod curent așteptăm ca în folderul /wasm/ să existe clang.js care exportă o funcție default
+    // ce inițializează Module (Emscripten) sau să seteze window.Module.
+    const mod = await import('./clang.js');
 
-    let ModuleFactory = mod.default || mod.createModule || mod.Module || null;
+    // mod.default poate fi: (ModuleArgs) => Promise(Module)
+    const ModuleFactory = mod.default || mod.createModule || null;
 
-    if (!ModuleFactory) {
-      // Dacă modul a fost construit ca script Emscripten care setează global Module, încercăm fallback:
-      if (window.Module) {
-        ModuleFactory = () => Promise.resolve(window.Module);
-      } else {
-        throw new Error('clang.js găsit, dar nu conține o funcție de inițializare compatibilă.');
-      }
+    if (!ModuleFactory && !window.Module) {
+      throw new Error('clang.js nu conține o funcție de inițializare compatibilă și window.Module nu este setat.');
     }
 
-    // Creăm Module cu locateFile pentru a indica unde se găsește clang.wasm
     const moduleArgs = {
       locateFile: (file) => locateFile(file),
-      // orice alte setări Module pot fi puse aici
+      // poți adăuga alte opțiuni Module aici
     };
 
-    const Module = await ModuleFactory(moduleArgs);
+    let Module;
+    if (ModuleFactory) {
+      Module = await ModuleFactory(moduleArgs);
+    } else {
+      // fallback la Module global (ex.: build care folosește var Module = {...})
+      Module = window.Module;
+    }
 
-    // Aici depinde de build-ul clang.wasm cum expune funcționalitatea.
-    // Propunem o interfață uniformă: compileAndRun(code, {args: [...]})
-    // Implementăm wrapper care apelează funcțiile expuse de Module (dacă există).
+    // Daca build-ul expune direct compileAndRun:
     if (typeof Module.compileAndRun === 'function') {
       return {
         compileAndRun: (src, opts = {}) => Module.compileAndRun(src, opts)
       };
     }
 
-    // Fallback: multe portări folosesc ccall/cwrap sau un API custom.
-    // Încercăm un API comun: Module.ccall('compile_and_run', ...)
+    // Dacă build-ul expune un API custom (ex: Module.ccall), poți adapta aici.
     if (typeof Module.ccall === 'function') {
       return {
         compileAndRun: async (src, opts = {}) => {
-          // Notă: implementarea exactă depinde de build-ul clang-wasm.
-          // Pentru multe pachete, există o funcție JS helper. Dacă nu, documentația din wasm/README.md te ajută.
-          throw new Error('Acest build clang.js necesită un wrapper specific. Vezi wasm/README.md pentru instrucțiuni.');
+          // Aceasta este doar un placeholder — majoritatea build-urilor vin cu un wrapper JS.
+          throw new Error('Build-ul clang folosit necesită un wrapper JS specific. Adaptează clang-loader.js la API-ul build-ului tău.');
         }
       };
     }
 
-    throw new Error('Am încărcat clang.js, dar nu am putut detecta un API standard (compileAndRun / ccall). Verifică build-ul sau folosește pachetul recomandat din README.');
+    throw new Error('Am încărcat clang.js, dar nu am detectat un API de rulare. Verifică build-ul clang-wasm și README-ul din /wasm/.');
 
   } catch (err) {
-    const userMessage = [
-      'Nu am putut încărca clang.js din folderul /cpp/wasm.',
-      'Asigură-te că ai descărcat clang.wasm și clang.js (vezi wasm/README.md).',
+    const msg = [
+      'Nu am putut inițializa clang din folderul /wasm/.',
+      'Asigură-te că ai copiat clang.js și clang.wasm în /wasm/ (vezi wasm/README.md).',
       'Eroare internă: ' + (err && err.message ? err.message : String(err))
     ].join(' ');
-    throw new Error(userMessage);
+    throw new Error(msg);
   }
 }
