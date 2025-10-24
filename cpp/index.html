@@ -39,6 +39,11 @@
     </div>
 
     <section>
+      <h2>Stdin (opțional)</h2>
+      <textarea id="stdin" placeholder="Dacă programul așteaptă input, scrie-l aici..." rows="3" style="width:100%;border-radius:8px;border:1px solid #ddd;padding:8px;background:#fbfbfb;font-family:ui-monospace;"></textarea>
+    </section>
+
+    <section>
       <h2>Cod final generat</h2>
       <pre id="finalCode" class="output monospace" aria-live="polite">Codul final (șablon + cod utilizator) va apărea aici.</pre>
     </section>
@@ -49,7 +54,7 @@
     </section>
 
     <footer class="footer">
-      <small>Notă: pentru a încărca compilatorul WASM (clang.wasm + clang.js) plasează fișierele în /wasm/ și rulează site-ul pe un server static (ex.: python -m http.server).</small>
+      <small>Notă: această variantă folosește Judge0 CE (ce.judge0.com) — necesită internet. Pentru execuție complet locală (clang.wasm) vezi /wasm/README.md.</small>
     </footer>
   </main>
 
