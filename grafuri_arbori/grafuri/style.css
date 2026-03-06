@@ -7,8 +7,8 @@
 	inset: 0;
 	display: grid;
 	place-items: center;
-	background: rgba(2, 6, 23, 0.78);
-	backdrop-filter: blur(4px);
+	background: rgba(4, 14, 20, 0.76);
+	backdrop-filter: blur(6px);
 	z-index: 20;
 }
 
@@ -22,9 +22,9 @@
 	width: min(640px, calc(100vw - 24px));
 	padding: 24px;
 	border-radius: 16px;
-	background: rgba(15, 23, 42, 0.95);
-	border: 1px solid rgba(129, 140, 248, 0.35);
-	box-shadow: 0 18px 60px rgba(15, 23, 42, 0.6);
+	background: linear-gradient(180deg, rgba(7, 23, 31, 0.96), rgba(4, 16, 22, 0.95));
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
 }
 
 .intro-card h2 {
@@ -48,8 +48,8 @@
 .intro-grid select {
 	width: 100%;
 	margin-top: 6px;
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(255, 255, 255, 0.14);
+	background: rgba(4, 15, 21, 0.7);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	color: #e2e8f0;
 	border-radius: 8px;
 	padding: 8px 10px;
@@ -58,10 +58,10 @@
 .intro-preview {
 	margin: 14px 0;
 	border-radius: 8px;
-	border: 1px solid rgba(148, 163, 184, 0.2);
-	background: rgba(2, 6, 23, 0.6);
-	color: #a5b4fc;
-	font-family: "Fira Mono", "Cascadia Code", monospace;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	background: rgba(3, 12, 18, 0.65);
+	color: #b9f6e8;
+	font-family: "JetBrains Mono", "Consolas", monospace;
 	font-size: 0.86rem;
 	padding: 10px;
 	max-height: 120px;
