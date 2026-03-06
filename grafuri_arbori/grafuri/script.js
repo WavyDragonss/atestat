@@ -228,7 +228,7 @@ function forceLayout(existingNodes, edges, width, height) {
   const area = width * height;
   const ideal = Math.sqrt(area / Math.max(1, nodes.length));
 
-  for (let iter = 0; iter < 280; iter++) {
+  for (let iter = 0; iter < 320; iter++) {
     const force = {};
     for (const n of nodes) force[n] = { x: 0, y: 0 };
 
@@ -262,8 +262,12 @@ function forceLayout(existingNodes, edges, width, height) {
       force[v].y -= fy;
     }
 
-    const cooling = 0.88;
+    const cooling = 0.9;
     for (const node of nodes) {
+      // Keep clusters centered and reduce jitter near borders.
+      force[node].x += (cx - positions[node].x) * 0.02;
+      force[node].y += (cy - positions[node].y) * 0.02;
+
       velocity[node].x = (velocity[node].x + force[node].x * 0.01) * cooling;
       velocity[node].y = (velocity[node].y + force[node].y * 0.01) * cooling;
       positions[node].x += velocity[node].x;
@@ -339,6 +343,7 @@ const structureInputs = document.querySelectorAll('input[name="structure"]');
 const rootInput = document.getElementById('rootInput');
 const rootNodeInput = document.getElementById('rootNode');
 const analysisDiv = document.getElementById('analysis');
+const resultTitle = document.getElementById('resultTitle');
 const toggleStatsBtn = document.getElementById('toggleStatsBtn');
 const treeStatsPanel = document.getElementById('treeStatsPanel');
 const generatedBlock = document.getElementById('generatedBlock');
@@ -350,7 +355,7 @@ const introFormat = document.getElementById('introFormat');
 const introPreview = document.getElementById('introPreview');
 const introStartBtn = document.getElementById('introStartBtn');
 
-let currentMode = 'ascii';
+let currentMode = 'svg';
 let lastAdj = [];
 let lastType = 'graf';
 let lastRoot = -1;
@@ -360,6 +365,10 @@ let statsVisible = false;
 function showStatus(message, ok = true) {
   statusMsg.textContent = message;
   statusMsg.style.color = ok ? '#1756e9' : '#e0195a';
+}
+
+function refreshResultTitle() {
+  resultTitle.textContent = currentMode === 'ascii' ? 'Rezultat ASCII' : 'Rezultat grafic';
 }
 
 function getSample(structure, format) {
@@ -513,6 +522,7 @@ function parseAndDraw() {
       }
     }
 
+    refreshResultTitle();
     showStatus('Structura a fost generata cu succes.', true);
   } catch (error) {
     asciiOut.textContent = '(eroare la parse)';
@@ -567,6 +577,7 @@ copyBtn.addEventListener('click', () => {
 toggleModeBtn.addEventListener('click', () => {
   currentMode = currentMode === 'ascii' ? 'svg' : 'ascii';
   toggleModeBtn.textContent = `Mod: ${currentMode === 'ascii' ? 'ASCII' : 'Grafic'}`;
+  refreshResultTitle();
   if (lastExistingNodes.size) parseAndDraw();
 });
 
@@ -590,3 +601,7 @@ introStartBtn.addEventListener('click', () => {
 
 syncRootInputVisibility();
 updateIntroPreview();
+refreshResultTitle();
+asciiOut.parentElement.style.display = 'none';
+svgOut.style.display = '';
+svgOut.innerHTML = '<div style="padding:18px;color:#9db6c0">(apasă Parse & Draw pentru a genera rezultatul grafic)</div>';
