@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>📘 Backtracking Numeric (cifre crescătoare)</title>
+  <title>Backtracking Numeric (cifre crescătoare)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="hero-bg"></div>
   <div class="container">
-    <h1>📘 Backtracking Numeric (cifre crescătoare)</h1>
+    <div class="page-header">
+      <a href="../../index.html" class="back-btn">← Acasă</a>
+      <h1 class="page-title">📘 Backtracking Numeric</h1>
+    </div>
     <p>Generează toate numerele de n cifre, cu reguli flexibile și afișare controlată.</p>
     <div class="section">
       <label>Lungime număr (n):</label>
@@ -17,9 +21,8 @@
         <label><input type="checkbox" class="rule" value="strictIncreasing" checked> Strict crescător</label>
         <label><input type="checkbox" class="rule" value="noTwoEven"> Fără două pare consecutive</label>
         <label><input type="checkbox" class="rule" value="descendingOrder"> Ordine descrescătoare</label>
-        <!-- Extensibil: mai adaugi reguli aici simplu -->
       </div>
-      <div>
+      <div class="buttons">
         <button id="generateBtn" class="blue">Generează</button>
         <button id="expandBtn" class="gray">Extinde toate</button>
         <button id="collapseBtn" class="gray" style="display:none">Ascunde</button>

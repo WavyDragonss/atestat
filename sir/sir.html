@@ -7,8 +7,12 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="hero-bg"></div>
   <div class="container">
-    <h1>Problema 2: Analiza instrucțiunii strcpy și strlen</h1>
+    <div class="page-header">
+      <a href="../index.html" class="back-btn">← Acasă</a>
+      <h1 class="page-title">📝 Strcpy pentru șiruri de caractere</h1>
+    </div>
     <div class="section">
       <p>
         <strong>Cerință:</strong> Analizează efectul instrucțiunii <code>strcpy(s+2, s+4)</code> asupra șirului <code>s</code>.<br>
@@ -17,7 +21,9 @@
       <label>Șir inițial: <input type="text" id="s" value="abcdefgh"></label>
       <label>Offset destinație (s+): <input type="number" id="d" value="2" min="0"></label>
       <label>Offset sursă (s+): <input type="number" id="soff" value="4" min="0"></label>
-      <button id="calcBtn">Simulează</button>
+      <div class="buttons">
+        <button id="calcBtn">Simulează</button>
+      </div>
       <div id="output" class="result-block"></div>
     </div>
   </div>
