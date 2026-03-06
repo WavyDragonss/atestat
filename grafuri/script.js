@@ -102,7 +102,12 @@ function drawGraphAdjList(adj){
 // SVG rendering (circular for graf, ierarhic for arbore)
 function renderSVG(adj, type, root, directed=false, W=780, H=340){
   const n = adj.length;
-  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:sans-serif">`;
+  const nodeStroke = '#818cf8';
+  const nodeFill   = 'rgba(79,70,229,0.18)';
+  const textColor  = '#e2e8f0';
+  const edgeColor  = '#6366f1';
+  const bgColor    = 'rgba(0,0,0,0)';
+  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:sans-serif;background:${bgColor}">`;
   if(type==='arbore' && typeof root==='number' && root>=0){
     // Arbore ierarhic
     const props = analyzeTree(adj, root);
@@ -119,12 +124,12 @@ function renderSVG(adj, type, root, directed=false, W=780, H=340){
     levels.forEach((lvl, y)=>{
       lvl.forEach((u, i)=>{
         positions[u] = {x: dx/2 + i*dx, y: 60+y*dy};
-        svg += `<circle cx="${positions[u].x}" cy="${positions[u].y}" r="18" fill="#fff" stroke="#1756e9" stroke-width="3"/>
-          <text x="${positions[u].x}" y="${positions[u].y+7}" font-size="1.2em" text-anchor="middle" fill="#1756e9">${u+1}</text>`;
+        svg += `<circle cx="${positions[u].x}" cy="${positions[u].y}" r="18" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="2.5"/>
+          <text x="${positions[u].x}" y="${positions[u].y+7}" font-size="1.1em" text-anchor="middle" fill="${textColor}" font-weight="bold">${u+1}</text>`;
       });
     });
     for(let u=0;u<n;u++) for(let v of adj[u]){
-      svg += `<line x1="${positions[u].x}" y1="${positions[u].y}" x2="${positions[v].x}" y2="${positions[v].y}" stroke="#2556cc" stroke-width="2"/>`;
+      svg += `<line x1="${positions[u].x}" y1="${positions[u].y}" x2="${positions[v].x}" y2="${positions[v].y}" stroke="${edgeColor}" stroke-width="1.8"/>`;
     }
   }else{
     // Graf circular
@@ -147,14 +152,14 @@ function renderSVG(adj, type, root, directed=false, W=780, H=340){
           const dx = to.x-from.x, dy = to.y-from.y;
           const d = Math.sqrt(dx*dx+dy*dy);
           const ax = to.x - 18*(dx/d), ay = to.y - 18*(dy/d);
-          arrow = `<polygon points="${ax},${ay} ${ax-6*(dy/d)},${ay+6*(dx/d)} ${ax+6*(dy/d)},${ay-6*(dx/d)}" fill="#1756e9"/>`;
+          arrow = `<polygon points="${ax},${ay} ${ax-6*(dy/d)},${ay+6*(dx/d)} ${ax+6*(dy/d)},${ay-6*(dx/d)}" fill="${nodeStroke}"/>`;
         }
-        svg += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="#2556cc" stroke-width="2"/>${arrow}`;
+        svg += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" stroke="${edgeColor}" stroke-width="1.8"/>${arrow}`;
       }
     }
     for(let i=0;i<n;i++){
-      svg += `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="18" fill="#fff" stroke="#1756e9" stroke-width="3"/>
-              <text x="${pos[i].x}" y="${pos[i].y+7}" font-size="1.2em" text-anchor="middle" fill="#1756e9">${i+1}</text>`;
+      svg += `<circle cx="${pos[i].x}" cy="${pos[i].y}" r="18" fill="${nodeFill}" stroke="${nodeStroke}" stroke-width="2.5"/>
+              <text x="${pos[i].x}" y="${pos[i].y+7}" font-size="1.1em" text-anchor="middle" fill="${textColor}" font-weight="bold">${i+1}</text>`;
     }
   }
   svg += '</svg>';
