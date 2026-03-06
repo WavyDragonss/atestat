@@ -8,6 +8,37 @@
 </head>
 <body>
   <div class="hero-bg"></div>
+  <div id="introOverlay" class="intro-overlay">
+    <div class="intro-card">
+      <h2>Ce vrei sa vizualizezi?</h2>
+      <p>Alege mai intai tipul structurii si formatul de input pentru rezultate mai bune.</p>
+      <div class="intro-grid">
+        <label>
+          Structura
+          <select id="introStructure">
+            <option value="graf">Graf</option>
+            <option value="arbore">Arbore</option>
+          </select>
+        </label>
+        <label>
+          Format input
+          <select id="introFormat">
+            <option value="matrix">Matrice</option>
+            <option value="list">Lista</option>
+          </select>
+        </label>
+        <label>
+          Tip graf
+          <select id="introDirected">
+            <option value="false">Neorientat</option>
+            <option value="true">Orientat</option>
+          </select>
+        </label>
+      </div>
+      <pre id="introPreview" class="intro-preview"></pre>
+      <button id="introStartBtn" class="blue">Configureaza si incepe</button>
+    </div>
+  </div>
   <div class="container">
     <div class="page-header">
       <a href="../index.html" class="back-btn">← Acasă</a>
@@ -52,6 +83,10 @@
         <pre id="asciiOut" class="ascii">(apasă Parse &amp; Draw pentru a genera)</pre>
       </div>
       <div id="svgOut" class="svg-card" style="display:none"></div>
+      <div class="controls">
+        <button id="toggleStatsBtn" class="gray" style="display:none">Arata statistici arbore</button>
+      </div>
+      <div id="treeStatsPanel" class="result-block" style="display:none"></div>
       <div id="analysis" class="result-block"></div>
     </div>
   </div>

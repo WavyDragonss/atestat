@@ -1,0 +1,77 @@
+@import url("../style.css");
+/* local overrides */
+.container { max-width: 880px; }
+
+.intro-overlay {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	background: rgba(2, 6, 23, 0.78);
+	backdrop-filter: blur(4px);
+	z-index: 20;
+}
+
+.intro-overlay.hide {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.26s ease;
+}
+
+.intro-card {
+	width: min(640px, calc(100vw - 24px));
+	padding: 24px;
+	border-radius: 16px;
+	background: rgba(15, 23, 42, 0.95);
+	border: 1px solid rgba(129, 140, 248, 0.35);
+	box-shadow: 0 18px 60px rgba(15, 23, 42, 0.6);
+}
+
+.intro-card h2 {
+	margin-bottom: 8px;
+}
+
+.intro-card p {
+	margin-bottom: 14px;
+}
+
+.intro-grid {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.intro-grid label {
+	margin: 0;
+}
+
+.intro-grid select {
+	width: 100%;
+	margin-top: 6px;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	color: #e2e8f0;
+	border-radius: 8px;
+	padding: 8px 10px;
+}
+
+.intro-preview {
+	margin: 14px 0;
+	border-radius: 8px;
+	border: 1px solid rgba(148, 163, 184, 0.2);
+	background: rgba(2, 6, 23, 0.6);
+	color: #a5b4fc;
+	font-family: "Fira Mono", "Cascadia Code", monospace;
+	font-size: 0.86rem;
+	padding: 10px;
+	max-height: 120px;
+	overflow: auto;
+}
+
+#introStartBtn {
+	width: 100%;
+}
+
+#toggleStatsBtn {
+	margin-top: 10px;
+}
