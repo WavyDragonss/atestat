@@ -27,13 +27,6 @@
             <option value="list">Lista</option>
           </select>
         </label>
-        <label>
-          Tip graf
-          <select id="introDirected">
-            <option value="false">Neorientat</option>
-            <option value="true">Orientat</option>
-          </select>
-        </label>
       </div>
       <pre id="introPreview" class="intro-preview"></pre>
       <button id="introStartBtn" class="blue">Configureaza si incepe</button>
@@ -45,7 +38,13 @@
       <h1 class="page-title">🕸️ Vizualizator grafic de grafuri</h1>
     </div>
     <p>Poți introduce matricea sau lista de adiacență a unui graf (orientat sau neorientat) și vei vedea reprezentarea ASCII + SVG.</p>
+    <div class="mini-tags">
+      <span>Validare noduri</span>
+      <span>Layout modern</span>
+      <span>Statistici arbore</span>
+    </div>
     <div class="section">
+      <h2 class="panel-title">Panou configurare</h2>
       <label>Format input:</label>
       <div class="controls">
         <label><input type="radio" name="format" value="matrix" checked> Matrice</label>
@@ -59,17 +58,13 @@
       <div id="rootInput" style="display:none;">
         <label>Rădăcină (nr. nod): <input type="number" id="rootNode" min="1"></label>
       </div>
-      <label>Tip graf:</label>
-      <div class="controls">
-        <label><input type="radio" name="directed" value="false" checked> Neorientat</label>
-        <label><input type="radio" name="directed" value="true"> Orientat</label>
-      </div>
       <label>Mod afișare:</label>
       <div class="controls">
         <button id="toggleModeBtn" class="blue">Mod: ASCII</button>
       </div>
       <label>Input:</label>
       <textarea id="inputArea" placeholder="Ex: 0 1 1 1&#10;1 0 1 1&#10;1 1 0 1&#10;1 1 1 0"></textarea>
+      <p class="field-hint">Tip: folosește butonul de introducere inițială pentru un exemplu adaptat automat tipului de structură.</p>
       <div class="buttons">
         <button id="parseBtn">Parse &amp; Draw</button>
         <button id="clearBtn" class="gray">Clear</button>
@@ -78,7 +73,7 @@
       <div id="statusMsg" class="status"></div>
     </div>
     <div class="section">
-      <h2>Rezultat ASCII</h2>
+      <h2 class="panel-title">Rezultate vizualizare</h2>
       <div class="ascii-card">
         <pre id="asciiOut" class="ascii">(apasă Parse &amp; Draw pentru a genera)</pre>
       </div>
@@ -87,6 +82,19 @@
         <button id="toggleStatsBtn" class="gray" style="display:none">Arata statistici arbore</button>
       </div>
       <div id="treeStatsPanel" class="result-block" style="display:none"></div>
+      <div id="generatedBlock" class="result-block" style="display:none">
+        <strong>Reprezentari generate automat</strong>
+        <div class="generated-grid">
+          <div>
+            <label>Lista de adiacenta</label>
+            <pre id="generatedList" class="ascii"></pre>
+          </div>
+          <div>
+            <label>Matrice de adiacenta</label>
+            <pre id="generatedMatrix" class="ascii"></pre>
+          </div>
+        </div>
+      </div>
       <div id="analysis" class="result-block"></div>
     </div>
   </div>

@@ -67,6 +67,20 @@ body {
   animation: enter-up 0.7s cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
 
+.hero-kicker {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbeee4;
+  background: rgba(37, 194, 160, 0.16);
+}
+
 .logo-area {
   margin-bottom: 18px;
 }
@@ -107,9 +121,34 @@ h1 {
   gap: 12px;
 }
 
+.hero-metrics {
+  margin: 0 0 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metric {
+  padding: 9px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(6, 19, 26, 0.45);
+}
+
+.metric strong {
+  display: block;
+  font-size: 0.92rem;
+  color: #ddfff7;
+}
+
+.metric span {
+  font-size: 0.76rem;
+  color: #8eb0bd;
+}
+
 .big-btn {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
@@ -149,6 +188,17 @@ h1 {
 .btn-text {
   text-align: left;
   font-weight: 600;
+}
+
+.btn-chip {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 4px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.09);
+  color: #d5eaf1;
 }
 
 .btn-arrow {
@@ -434,5 +484,17 @@ input[type="checkbox"] {
 
   .btn-text {
     font-size: 0.93rem;
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .big-btn {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .btn-chip {
+    display: none;
   }
 }

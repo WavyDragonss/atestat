@@ -2,6 +2,48 @@
 /* local overrides */
 .container { max-width: 880px; }
 
+.mini-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 0 14px;
+}
+
+.mini-tags span {
+	padding: 5px 10px;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: #caece2;
+	background: rgba(37, 194, 160, 0.14);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.panel-title {
+	margin-bottom: 12px;
+}
+
+.field-hint {
+	margin-top: 8px;
+	font-size: 0.84rem;
+	color: #9db6c0;
+}
+
+.generated-grid {
+	display: grid;
+	gap: 10px;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	margin-top: 10px;
+}
+
+.generated-grid > div {
+	padding: 10px;
+	border-radius: 10px;
+	background: rgba(3, 12, 18, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .intro-overlay {
 	position: fixed;
 	inset: 0;

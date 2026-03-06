@@ -68,19 +68,9 @@ function parseList(text) {
   };
 }
 
-function detectRoots(adj, oriented, existingNodes) {
+function detectRoots(adj, existingNodes) {
   const nodes = [...existingNodes].sort((a, b) => a - b);
   if (!nodes.length) return [];
-
-  if (oriented) {
-    const indeg = Array(adj.length).fill(0);
-    for (const u of nodes) {
-      for (const v of adj[u] || []) {
-        if (existingNodes.has(v)) indeg[v]++;
-      }
-    }
-    return nodes.filter((node) => indeg[node] === 0);
-  }
 
   let best = -1;
   const degree = new Map();
@@ -195,7 +185,7 @@ function computeTreeLayout(tree, root, width, height) {
   return positions;
 }
 
-function getEdgeList(adj, existingNodes, directed) {
+function getEdgeList(adj, existingNodes) {
   const edges = [];
   const seen = new Set();
   const nodes = [...existingNodes];
@@ -203,16 +193,12 @@ function getEdgeList(adj, existingNodes, directed) {
   for (const u of nodes) {
     for (const v of adj[u] || []) {
       if (!existingNodes.has(v)) continue;
-      if (directed) {
-        edges.push([u, v]);
-      } else {
-        const a = Math.min(u, v);
-        const b = Math.max(u, v);
-        const key = `${a}|${b}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          edges.push([a, b]);
-        }
+      const a = Math.min(u, v);
+      const b = Math.max(u, v);
+      const key = `${a}|${b}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        edges.push([a, b]);
       }
     }
   }
@@ -290,13 +276,12 @@ function forceLayout(existingNodes, edges, width, height) {
   return positions;
 }
 
-function renderSVG(adj, type, root, directed, existingNodes, width = 780, height = 380) {
+function renderSVG(adj, type, root, existingNodes, width = 780, height = 380) {
   const nodeStroke = '#818cf8';
   const nodeFill = 'rgba(79,70,229,0.2)';
   const textColor = '#e2e8f0';
   const edgeColor = '#6366f1';
   let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="font-family:sans-serif">`;
-  svg += '<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#818cf8"></path></marker></defs>';
 
   if (type === 'arbore' && root >= 0) {
     const tree = buildTree(adj, root, existingNodes);
@@ -325,12 +310,11 @@ function renderSVG(adj, type, root, directed, existingNodes, width = 780, height
       }
     }
   } else {
-    const edges = getEdgeList(adj, existingNodes, directed);
+    const edges = getEdgeList(adj, existingNodes);
     const positions = forceLayout(existingNodes, edges, width, height);
 
     for (const [u, v] of edges) {
-      const marker = directed ? ' marker-end="url(#arrow)"' : '';
-      svg += `<line x1="${positions[u].x}" y1="${positions[u].y}" x2="${positions[v].x}" y2="${positions[v].y}" stroke="${edgeColor}" stroke-width="1.7"${marker}/>`;
+      svg += `<line x1="${positions[u].x}" y1="${positions[u].y}" x2="${positions[v].x}" y2="${positions[v].y}" stroke="${edgeColor}" stroke-width="1.7"/>`;
     }
 
     for (const node of [...existingNodes].sort((a, b) => a - b)) {
@@ -357,16 +341,17 @@ const rootNodeInput = document.getElementById('rootNode');
 const analysisDiv = document.getElementById('analysis');
 const toggleStatsBtn = document.getElementById('toggleStatsBtn');
 const treeStatsPanel = document.getElementById('treeStatsPanel');
+const generatedBlock = document.getElementById('generatedBlock');
+const generatedList = document.getElementById('generatedList');
+const generatedMatrix = document.getElementById('generatedMatrix');
 const introOverlay = document.getElementById('introOverlay');
 const introStructure = document.getElementById('introStructure');
 const introFormat = document.getElementById('introFormat');
-const introDirected = document.getElementById('introDirected');
 const introPreview = document.getElementById('introPreview');
 const introStartBtn = document.getElementById('introStartBtn');
 
 let currentMode = 'ascii';
 let lastAdj = [];
-let lastDirected = false;
 let lastType = 'graf';
 let lastRoot = -1;
 let lastExistingNodes = new Set();
@@ -409,6 +394,35 @@ function parseInput(text, format) {
   return format === 'matrix' ? parseMatrix(text) : parseList(text);
 }
 
+function adjToListText(adj, existingNodes) {
+  const nodes = [...existingNodes].sort((a, b) => a - b);
+  return nodes
+    .map((node) => `${node + 1}: ${((adj[node] || []).filter((x) => existingNodes.has(x)).map((x) => x + 1).join(' ')) || ''}`)
+    .join('\n');
+}
+
+function adjToMatrixText(adj, existingNodes) {
+  const nodes = [...existingNodes].sort((a, b) => a - b);
+  const idx = new Map(nodes.map((node, i) => [node, i]));
+  const n = nodes.length;
+  const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+
+  for (const from of nodes) {
+    for (const to of adj[from] || []) {
+      if (!idx.has(to)) continue;
+      matrix[idx.get(from)][idx.get(to)] = 1;
+      matrix[idx.get(to)][idx.get(from)] = 1;
+    }
+  }
+  return matrix.map((row) => row.join(' ')).join('\n');
+}
+
+function updateGeneratedRepresentations(adj, existingNodes) {
+  generatedList.textContent = adjToListText(adj, existingNodes);
+  generatedMatrix.textContent = adjToMatrixText(adj, existingNodes);
+  generatedBlock.style.display = '';
+}
+
 function setTreeStats(treeStats) {
   const rows = treeStats.rows
     .map((row) => `<tr><td>${row.node}</td><td>${row.degree}</td><td>${row.sonsCount}</td><td>${row.sons.length ? row.sons.join(', ') : '—'}</td><td>${row.isLeaf ? 'Da' : 'Nu'}</td></tr>`)
@@ -431,12 +445,16 @@ function hideTreeStats() {
 function parseAndDraw() {
   try {
     const format = document.querySelector('input[name="format"]:checked').value;
-    const directed = document.querySelector('input[name="directed"]:checked').value === 'true';
     const type = document.querySelector('input[name="structure"]:checked').value;
-    const text = inputArea.value;
+    const text = inputArea.value.trim() || getSample(type, format);
+    if (!inputArea.value.trim()) {
+      inputArea.value = text;
+      showStatus('Input gol detectat. Am completat automat un exemplu.', true);
+    }
     const { adj, existingNodes } = parseInput(text, format);
 
     if (!existingNodes.size) throw new Error('Nu s-au gasit noduri valide in input.');
+    updateGeneratedRepresentations(adj, existingNodes);
 
     let root = -1;
     if (type === 'arbore') {
@@ -446,7 +464,7 @@ function parseAndDraw() {
         root = rootValue - 1;
         if (!existingNodes.has(root)) throw new Error('Radacina trebuie sa fie un nod existent in input.');
       } else {
-        const candidates = detectRoots(adj, directed, existingNodes);
+        const candidates = detectRoots(adj, existingNodes);
         if (!candidates.length) throw new Error('Nu s-a putut detecta radacina automat.');
         root = candidates[0];
         rootNodeInput.value = String(root + 1);
@@ -454,7 +472,6 @@ function parseAndDraw() {
     }
 
     lastAdj = adj;
-    lastDirected = directed;
     lastType = type;
     lastRoot = root;
     lastExistingNodes = existingNodes;
@@ -477,7 +494,7 @@ function parseAndDraw() {
         asciiOut.parentElement.style.display = '';
         svgOut.style.display = 'none';
       } else {
-        svgOut.innerHTML = renderSVG(adj, type, root, directed, existingNodes, 780, 380);
+        svgOut.innerHTML = renderSVG(adj, type, root, existingNodes, 780, 380);
         svgOut.style.display = '';
         asciiOut.parentElement.style.display = 'none';
       }
@@ -490,7 +507,7 @@ function parseAndDraw() {
         asciiOut.parentElement.style.display = '';
         svgOut.style.display = 'none';
       } else {
-        svgOut.innerHTML = renderSVG(adj, type, root, directed, existingNodes, 780, 380);
+        svgOut.innerHTML = renderSVG(adj, type, root, existingNodes, 780, 380);
         svgOut.style.display = '';
         asciiOut.parentElement.style.display = 'none';
       }
@@ -524,6 +541,9 @@ clearBtn.addEventListener('click', () => {
   asciiOut.textContent = '(apasa Parse & Draw pentru a genera)';
   svgOut.innerHTML = '';
   analysisDiv.innerHTML = '';
+  generatedList.textContent = '';
+  generatedMatrix.textContent = '';
+  generatedBlock.style.display = 'none';
   hideTreeStats();
   showStatus('');
 });
@@ -550,14 +570,13 @@ toggleModeBtn.addEventListener('click', () => {
   if (lastExistingNodes.size) parseAndDraw();
 });
 
-[introStructure, introFormat, introDirected].forEach((control) => {
+[introStructure, introFormat].forEach((control) => {
   control.addEventListener('change', updateIntroPreview);
 });
 
 introStartBtn.addEventListener('click', () => {
   setRadioValue('structure', introStructure.value);
   setRadioValue('format', introFormat.value);
-  setRadioValue('directed', introDirected.value);
   syncRootInputVisibility();
   inputArea.value = getSample(introStructure.value, introFormat.value);
   if (introStructure.value === 'arbore' && !rootNodeInput.value) rootNodeInput.value = '1';
